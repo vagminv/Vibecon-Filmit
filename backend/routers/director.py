@@ -174,24 +174,47 @@ async def upload_video_segment(
     segment_name: str,
     file: UploadFile = File(...)
 ):
-    """Upload a video segment for a project"""
+    """Upload a video segment for a project (replaces existing if present)"""
     try:
         # Create upload directory if it doesn't exist
         upload_dir = Path("/app/backend/uploads")
         upload_dir.mkdir(exist_ok=True)
         
-        # Save file
+        # Get project to check for existing segment
+        project = await db.video_projects.find_one({"project_id": project_id}, {"_id": 0})
+        
+        # Delete old file if it exists for this segment
+        if project and project.get("uploaded_segments"):
+            for seg in project["uploaded_segments"]:
+                if seg.get("segment_name") == segment_name:
+                    old_file_path = Path(seg.get("file_path", ""))
+                    if old_file_path.exists():
+                        try:
+                            old_file_path.unlink()
+                            logger.info(f"Deleted old file for segment {segment_name}: {old_file_path}")
+                        except Exception as e:
+                            logger.warning(f"Could not delete old file {old_file_path}: {e}")
+        
+        # Save new file
         file_path = upload_dir / f"{project_id}_{segment_name}_{file.filename}"
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Update project in database
+        # Update project in database - remove old segment and add new one
         segment_data = {
             "segment_name": segment_name,
             "file_path": str(file_path),
             "filename": file.filename,
             "uploaded_at": datetime.now(timezone.utc).isoformat()
         }
+        
+        # Remove any existing segment with same name, then add the new one
+        await db.video_projects.update_one(
+            {"project_id": project_id},
+            {
+                "$pull": {"uploaded_segments": {"segment_name": segment_name}}
+            }
+        )
         
         await db.video_projects.update_one(
             {"project_id": project_id},
