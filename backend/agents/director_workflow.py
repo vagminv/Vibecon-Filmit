@@ -631,6 +631,17 @@ You're their coach and partner in creating viral content."""
     
     async def _save_project_state(self, state: DirectorState):
         """Save project state to MongoDB"""
+        # Convert messages to serializable format
+        messages_data = []
+        for msg in state.get("messages", []):
+            if hasattr(msg, 'content'):
+                msg_type = "human" if msg.__class__.__name__ == "HumanMessage" else "ai"
+                messages_data.append({
+                    "type": msg_type,
+                    "content": msg.content,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+        
         project_data = {
             "project_id": state["project_id"],
             "user_goal": state.get("user_goal", ""),
@@ -641,6 +652,7 @@ You're their coach and partner in creating viral content."""
             "uploaded_segments": state.get("uploaded_segments", []),
             "edited_video_path": state.get("edited_video_path"),
             "current_step": state.get("current_step"),
+            "messages": messages_data,  # Save messages!
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
