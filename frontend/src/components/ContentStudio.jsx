@@ -266,7 +266,7 @@ const SortableShotCard = ({ shot, index, projectId, onUpdate, onDelete, uploadin
             </div>
           </div>
 
-          {!shot.uploaded && !isEditing && (
+          {!isEditing && (
             <Button
               size="sm"
               onClick={() => {
@@ -281,12 +281,17 @@ const SortableShotCard = ({ shot, index, projectId, onUpdate, onDelete, uploadin
               }}
               disabled={uploadingSegment === shot.segment_name}
               className="w-full"
-              variant="outline"
+              variant={shot.uploaded ? "secondary" : "outline"}
             >
               {uploadingSegment === shot.segment_name ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Uploading...
+                </>
+              ) : shot.uploaded ? (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Replace Footage
                 </>
               ) : (
                 <>
