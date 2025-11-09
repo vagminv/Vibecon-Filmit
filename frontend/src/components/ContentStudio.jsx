@@ -1051,14 +1051,14 @@ export const ContentStudio = () => {
 
       {/* Assembly Configuration Dialog */}
       <Dialog open={showAssemblyDialog} onOpenChange={setShowAssemblyDialog}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              Configure Video Assembly
+              <Clapperboard className="w-5 h-5" />
+              Generate Video
             </DialogTitle>
             <DialogDescription>
-              Customize how your final video will be assembled. Add transitions, subtitles, and optimize for your target platform.
+              Your video clips will be merged together into one continuous video.
             </DialogDescription>
           </DialogHeader>
           
