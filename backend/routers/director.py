@@ -112,7 +112,10 @@ async def create_director_project(
 
 
 @router.post("/message", response_model=DirectorResponse)
-async def send_director_message(input: DirectorMessageInput):
+async def send_director_message(
+    input: DirectorMessageInput,
+    current_user: UserResponse = Depends(get_current_user)
+):
     """Send a message in an existing Director project"""
     try:
         api_key = os.environ.get('EMERGENT_LLM_KEY')
@@ -120,11 +123,14 @@ async def send_director_message(input: DirectorMessageInput):
         if not api_key:
             raise HTTPException(status_code=500, detail="EMERGENT_LLM_KEY not configured")
         
-        # Load project state from database
-        project = await db.video_projects.find_one({"project_id": input.project_id}, {"_id": 0})
+        # Load project state from database - verify ownership
+        project = await db.video_projects.find_one({
+            "project_id": input.project_id,
+            "user_id": current_user.id
+        }, {"_id": 0})
         
         if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+            raise HTTPException(status_code=404, detail="Project not found or access denied")
         
         # Initialize workflow
         workflow = DirectorWorkflow(db=db, api_key=api_key)
