@@ -71,17 +71,6 @@ export const UserMenu = () => {
                 <FolderOpen className="w-4 h-4" />
                 My Projects
               </button>
-
-              <button
-                onClick={() => {
-                  navigate('/workspace');
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-primary/5 transition-colors flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Workspace
-              </button>
             </div>
 
             {/* Logout */}
