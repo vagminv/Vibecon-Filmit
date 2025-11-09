@@ -252,36 +252,12 @@ async def upload_video_segment(
 
 
 @router.get("/project/{project_id}")
-async def get_director_project(
-    project_id: str,
-    current_user: UserResponse = Depends(get_current_user)
-):
-    """Get project details - returns user's own projects or migrates old projects"""
-    # Try to find project with user_id
-    project = await db.video_projects.find_one({
-        "project_id": project_id,
-        "user_id": current_user.id
-    }, {"_id": 0})
-    
-    # If not found, check for old project without user_id (migration)
-    if not project:
-        old_project = await db.video_projects.find_one({
-            "project_id": project_id,
-            "user_id": {"$exists": False}
-        }, {"_id": 0})
-        
-        if old_project:
-            # Migrate: add current user as owner
-            await db.video_projects.update_one(
-                {"project_id": project_id},
-                {"$set": {"user_id": current_user.id}}
-            )
-            old_project["user_id"] = current_user.id
-            logger.info(f"Migrated project {project_id} to user {current_user.id}")
-            return old_project
+async def get_director_project(project_id: str):
+    """Get project details"""
+    project = await db.video_projects.find_one({"project_id": project_id}, {"_id": 0})
     
     if not project:
-        raise HTTPException(status_code=404, detail="Project not found or access denied")
+        raise HTTPException(status_code=404, detail="Project not found")
     
     return project
 
