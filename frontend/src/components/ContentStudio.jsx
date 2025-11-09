@@ -1062,169 +1062,33 @@ export const ContentStudio = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6 py-4">
-            
-            {/* Transitions */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="transitions" className="text-base font-semibold">Add Transitions</Label>
-                  <p className="text-sm text-muted-foreground">Smooth transitions between shots</p>
-                </div>
-                <Switch
-                  id="transitions"
-                  checked={assemblyOptions.add_transitions}
-                  onCheckedChange={(checked) => 
-                    setAssemblyOptions(prev => ({ ...prev, add_transitions: checked }))
-                  }
-                />
+          <div className="py-6">
+            <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Film className="w-6 h-6 text-primary" />
               </div>
-              
-              {assemblyOptions.add_transitions && (
-                <div className="grid grid-cols-2 gap-4 pl-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="transition-type">Transition Type</Label>
-                    <Select
-                      value={assemblyOptions.transition_type}
-                      onValueChange={(value) => 
-                        setAssemblyOptions(prev => ({ ...prev, transition_type: value }))
-                      }
-                    >
-                      <SelectTrigger id="transition-type">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="fade">Fade</SelectItem>
-                        <SelectItem value="wipe">Wipe</SelectItem>
-                        <SelectItem value="dissolve">Dissolve</SelectItem>
-                        <SelectItem value="slidedown">Slide Down</SelectItem>
-                        <SelectItem value="slideup">Slide Up</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="transition-duration">Duration (seconds)</Label>
-                    <input
-                      id="transition-duration"
-                      type="number"
-                      min="0.1"
-                      max="2"
-                      step="0.1"
-                      value={assemblyOptions.transition_duration}
-                      onChange={(e) => 
-                        setAssemblyOptions(prev => ({ 
-                          ...prev, 
-                          transition_duration: parseFloat(e.target.value) 
-                        }))
-                      }
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="border-t pt-4" />
-            
-            {/* Subtitles */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="subtitles" className="text-base font-semibold">Add Subtitles</Label>
-                  <p className="text-sm text-muted-foreground">Auto-generated from shot scripts</p>
-                </div>
-                <Switch
-                  id="subtitles"
-                  checked={assemblyOptions.add_subtitles}
-                  onCheckedChange={(checked) => 
-                    setAssemblyOptions(prev => ({ ...prev, add_subtitles: checked }))
-                  }
-                />
-              </div>
-              
-              {assemblyOptions.add_subtitles && (
-                <div className="grid grid-cols-2 gap-4 pl-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="subtitle-position">Position</Label>
-                    <Select
-                      value={assemblyOptions.subtitle_position}
-                      onValueChange={(value) => 
-                        setAssemblyOptions(prev => ({ ...prev, subtitle_position: value }))
-                      }
-                    >
-                      <SelectTrigger id="subtitle-position">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="top">Top</SelectItem>
-                        <SelectItem value="center">Center</SelectItem>
-                        <SelectItem value="bottom">Bottom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="subtitle-size">Font Size</Label>
-                    <input
-                      id="subtitle-size"
-                      type="number"
-                      min="24"
-                      max="72"
-                      step="4"
-                      value={assemblyOptions.subtitle_font_size}
-                      onChange={(e) => 
-                        setAssemblyOptions(prev => ({ 
-                          ...prev, 
-                          subtitle_font_size: parseInt(e.target.value) 
-                        }))
-                      }
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="border-t pt-4" />
-            
-            {/* Platform Optimization */}
-            <div className="space-y-3">
               <div>
-                <Label htmlFor="platform" className="text-base font-semibold">Optimize for Platform</Label>
-                <p className="text-sm text-muted-foreground mb-3">Adjust resolution and format for best results</p>
+                <h4 className="font-semibold mb-1">Quick Video Generation</h4>
+                <p className="text-sm text-muted-foreground">
+                  Your uploaded clips will be combined in order to create one continuous video. 
+                  This is a fast, simple merge without effects.
+                </p>
               </div>
-              
-              <Select
-                value={assemblyOptions.optimize_platform}
-                onValueChange={(value) => 
-                  setAssemblyOptions(prev => ({ ...prev, optimize_platform: value }))
-                }
-              >
-                <SelectTrigger id="platform">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="youtube">
-                    <div className="flex items-center gap-2">
-                      <Video className="w-4 h-4" />
-                      YouTube (1920x1080, 16:9)
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="tiktok">
-                    <div className="flex items-center gap-2">
-                      <Film className="w-4 h-4" />
-                      TikTok (1080x1920, 9:16)
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="instagram">
-                    <div className="flex items-center gap-2">
-                      <Film className="w-4 h-4" />
-                      Instagram Reels (1080x1920, 9:16)
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+            </div>
+            
+            <div className="mt-4 p-4 border rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Shot order preserved</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Original video quality maintained</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Fast processing (~5-10 seconds)</span>
+              </div>
             </div>
           </div>
 
@@ -1240,7 +1104,7 @@ export const ContentStudio = () => {
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
             >
               <Clapperboard className="w-4 h-4 mr-2" />
-              {assemblyStatus === 'completed' ? 'Regenerate Video' : 'Start Assembly'}
+              Generate Video
             </Button>
           </DialogFooter>
         </DialogContent>
