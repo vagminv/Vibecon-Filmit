@@ -7,7 +7,7 @@ import json
 import sys
 from datetime import datetime
 
-BASE_URL = "https://demobackend.emergentagent.com/api/auth"
+BASE_URL = "https://code-explorer-107.preview.emergentagent.com/api/auth"
 
 def print_section(title):
     print(f"\n{'='*60}")
@@ -18,7 +18,7 @@ def test_health():
     """Test if backend is healthy"""
     print_section("Testing Backend Health")
     try:
-        response = requests.get("https://demobackend.emergentagent.com/api/health", timeout=10)
+        response = requests.get("https://code-explorer-107.preview.emergentagent.com/api/health", timeout=10)
         if response.status_code == 200:
             data = response.json()
             print("✅ Backend is healthy")
