@@ -5,6 +5,7 @@ Video Assembly Service - Assembles Director shot segments into final video using
 import asyncio
 import os
 import uuid
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import logging
@@ -24,6 +25,30 @@ from video_tools import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# Check FFmpeg availability at module load
+def check_ffmpeg_installed():
+    """Check if FFmpeg is installed and accessible"""
+    ffmpeg_path = shutil.which('ffmpeg')
+    ffprobe_path = shutil.which('ffprobe')
+    
+    if not ffmpeg_path or not ffprobe_path:
+        logger.error("=" * 60)
+        logger.error("FFmpeg is not installed or not found in PATH!")
+        logger.error("Please install FFmpeg to use video assembly features.")
+        logger.error("Run: apt-get update && apt-get install -y ffmpeg")
+        logger.error("Or run the setup script: /app/setup.sh")
+        logger.error("=" * 60)
+        return False
+    
+    logger.info(f"FFmpeg found at: {ffmpeg_path}")
+    logger.info(f"FFprobe found at: {ffprobe_path}")
+    return True
+
+
+# Store FFmpeg availability status
+FFMPEG_AVAILABLE = check_ffmpeg_installed()
 
 
 class VideoAssemblyOptions(Dict):
