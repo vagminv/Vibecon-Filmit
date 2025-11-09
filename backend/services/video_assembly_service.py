@@ -178,106 +178,34 @@ class VideoAssemblyService:
         return assembly_id
     
     async def _assemble_video(self, assembly_id: str):
-        """Background task to assemble video"""
+        """Background task to assemble video - SIMPLIFIED: Just merge clips"""
         job = self.assembly_jobs[assembly_id]
         
         try:
             job['status'] = 'processing'
-            job['progress'] = 10
+            job['progress'] = 20
             
             segment_paths = job['segment_paths']
-            shot_list = job['shot_list']
-            options = job['options']
             
-            logger.info(f"Assembly {assembly_id}: Processing {len(segment_paths)} segments")
+            logger.info(f"Assembly {assembly_id}: Merging {len(segment_paths)} segments (simplified mode)")
             
-            # Step 1: Add subtitles to each segment if enabled
-            processed_segments = []
+            # SIMPLIFIED: Just concatenate all videos together - no transitions, no subtitles, no optimization
+            job['progress'] = 30
             
-            if options['add_subtitles'] and shot_list:
-                job['progress'] = 20
-                logger.info(f"Assembly {assembly_id}: Adding subtitles")
-                
-                for i, (segment_path, shot) in enumerate(zip(segment_paths, shot_list)):
-                    if not os.path.exists(segment_path):
-                        logger.warning(f"Segment not found: {segment_path}")
-                        continue
-                    
-                    script = shot.get('script', '')
-                    if script:
-                        # Add subtitles
-                        output_name = f"{assembly_id}_subtitle_{i}.mp4"
-                        result = await ffmpeg_add_subtitles(
-                            input_file=segment_path,
-                            output_file=output_name,
-                            subtitle_text=script[:100],  # Limit length for MVP
-                            font_size=options['subtitle_font_size'],
-                            position=options['subtitle_position']
-                        )
-                        
-                        if result['success']:
-                            processed_segments.append(result['output_file'])
-                            logger.info(f"Added subtitles to segment {i}")
-                        else:
-                            # Use original if subtitle fails
-                            processed_segments.append(segment_path)
-                            logger.warning(f"Subtitle failed for segment {i}: {result.get('error')}")
-                    else:
-                        processed_segments.append(segment_path)
-            else:
-                processed_segments = segment_paths
+            output_name = f"{assembly_id}_final.mp4"
+            result = await ffmpeg_merge_videos(
+                input_files=segment_paths,
+                output_file=output_name,
+                transition_duration=0  # No transitions
+            )
             
-            job['progress'] = 40
+            if not result['success']:
+                raise Exception(f"Merge failed: {result.get('error')}")
             
-            # Step 2: Merge segments with transitions
-            if options['add_transitions'] and len(processed_segments) > 1:
-                logger.info(f"Assembly {assembly_id}: Adding transitions")
-                job['progress'] = 50
-                
-                merged_output = await self._merge_with_transitions(
-                    assembly_id,
-                    processed_segments,
-                    options['transition_type'],
-                    options['transition_duration']
-                )
-            else:
-                # Simple concatenation without transitions
-                logger.info(f"Assembly {assembly_id}: Simple merge")
-                job['progress'] = 50
-                
-                output_name = f"{assembly_id}_merged.mp4"
-                result = await ffmpeg_merge_videos(
-                    input_files=processed_segments,
-                    output_file=output_name,
-                    transition_duration=0
-                )
-                
-                if not result['success']:
-                    raise Exception(f"Merge failed: {result.get('error')}")
-                
-                merged_output = result['output_file']
+            final_output = result['output_file']
             
-            job['progress'] = 70
-            
-            # Step 3: Optimize for platform if specified
-            final_output = merged_output
-            
-            if options.get('optimize_platform'):
-                logger.info(f"Assembly {assembly_id}: Optimizing for {options['optimize_platform']}")
-                job['progress'] = 80
-                
-                optimized_name = f"{assembly_id}_final.mp4"
-                result = await optimize_for_platform(
-                    input_file=merged_output,
-                    output_file=optimized_name,
-                    platform=options['optimize_platform']
-                )
-                
-                if result['success']:
-                    final_output = result['output_file']
-                    logger.info(f"Optimized for {options['optimize_platform']}")
-                else:
-                    logger.warning(f"Optimization failed: {result.get('error')}")
+            job['progress'] = 80
+            logger.info(f"Assembly {assembly_id}: Merge complete")
             
             job['progress'] = 90
             
