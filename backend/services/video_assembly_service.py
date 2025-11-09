@@ -142,17 +142,14 @@ class VideoAssemblyService:
         except Exception as e:
             logger.warning(f"Error cleaning up old assemblies: {e}")
         
-        # Set default options
+        # SIMPLIFIED: No complex options needed - just merge
         if options is None:
             options = {}
         
-        options.setdefault('add_transitions', True)
-        options.setdefault('transition_type', 'fade')
-        options.setdefault('transition_duration', 0.8)
-        options.setdefault('add_subtitles', True)
-        options.setdefault('subtitle_position', 'bottom')
-        options.setdefault('subtitle_font_size', 48)
-        options.setdefault('optimize_platform', 'youtube')
+        # All options disabled for simple merge
+        options['add_transitions'] = False
+        options['add_subtitles'] = False
+        options['optimize_platform'] = None
         
         # Create assembly job
         job = {
