@@ -176,8 +176,7 @@ async def send_director_message(input: DirectorMessageInput):
 async def upload_video_segment(
     project_id: str,
     segment_name: str,
-    file: UploadFile = File(...),
-    current_user: UserResponse = Depends(get_current_user)
+    file: UploadFile = File(...)
 ):
     """Upload a video segment for a project (replaces existing if present)"""
     try:
@@ -185,14 +184,8 @@ async def upload_video_segment(
         upload_dir = Path("/app/backend/uploads")
         upload_dir.mkdir(exist_ok=True)
         
-        # Get project and verify ownership
-        project = await db.video_projects.find_one({
-            "project_id": project_id,
-            "user_id": current_user.id
-        }, {"_id": 0})
-        
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found or access denied")
+        # Get project to check for existing segment
+        project = await db.video_projects.find_one({"project_id": project_id}, {"_id": 0})
         
         # Delete old file if it exists for this segment
         if project and project.get("uploaded_segments"):
