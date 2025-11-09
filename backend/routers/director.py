@@ -54,10 +54,7 @@ class DirectorResponse(BaseModel):
 
 
 @router.post("/project", response_model=DirectorResponse)
-async def create_director_project(
-    input: DirectorProjectCreate,
-    current_user: UserResponse = Depends(get_current_user)
-):
+async def create_director_project(input: DirectorProjectCreate):
     """Create a new video project with the Director workflow"""
     try:
         project_id = str(uuid.uuid4())
@@ -73,7 +70,6 @@ async def create_director_project(
         initial_state: DirectorState = {
             "messages": [HumanMessage(content=input.user_goal)],
             "project_id": project_id,
-            "user_id": current_user.id,  # Save user ID
             "user_goal": input.user_goal,
             "product_type": input.product_type,
             "target_platform": input.target_platform,
