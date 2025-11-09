@@ -13,10 +13,6 @@ import uuid
 import shutil
 from datetime import datetime, timezone
 
-# Import auth dependencies
-from utils.auth_dependencies import get_current_user
-from schemas.user import UserResponse
-
 # Import Director workflow
 import sys
 sys.path.append(str(Path(__file__).parent.parent / "agents"))
