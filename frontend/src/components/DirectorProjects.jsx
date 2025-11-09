@@ -84,6 +84,7 @@ export const DirectorProjects = () => {
                 <Film className="w-3 h-3 mr-1" />
                 My Projects
               </Badge>
+              <UserMenu />
             </div>
           </div>
         </div>
