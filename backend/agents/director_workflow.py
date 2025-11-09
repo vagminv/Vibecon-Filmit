@@ -644,6 +644,7 @@ You're their coach and partner in creating viral content."""
         
         project_data = {
             "project_id": state["project_id"],
+            "user_id": state.get("user_id"),  # Save user ID
             "user_goal": state.get("user_goal", ""),
             "product_type": state.get("product_type", ""),
             "target_platform": state.get("target_platform", ""),
